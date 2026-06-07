@@ -1,0 +1,7 @@
+{
+  "watch": ["*.js", "routes", "controllers", "services", "models"],
+  "ext": "js,json",
+  "env": {
+    "ALLOW_START_WITHOUT_DB": "true"
+  }
+}

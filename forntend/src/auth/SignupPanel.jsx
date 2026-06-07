@@ -1,4 +1,8 @@
-export default function SignupPanel({ onSwitch }) {
+import { memo } from 'react'
+
+import { PASSWORD_PATTERN } from '../validations/authValidation.js'
+
+function SignupPanel({ confirmPassword, email, error, name, onConfirmPasswordChange, onEmailChange, onNameChange, onPasswordChange, onSubmit, onSwitch, password, status, submitting }) {
 
   return (
     <div className="qs-auth__panel">
@@ -6,28 +10,72 @@ export default function SignupPanel({ onSwitch }) {
       <h2 className="qs-auth__title">Create account</h2>
       <p className="qs-auth__desc">Request access to simulate quantum circuits and validate post‑quantum security workflows.</p>
 
-      <form className="qs-auth__form" onSubmit={(e) => e.preventDefault()}>
+      <form className="qs-auth__form" onSubmit={onSubmit}>
         <label className="qs-auth__label">
           Name
-          <input className="qs-auth__input" type="text" placeholder="Dr. Ronak Patel" required />
+          <input
+            className="qs-auth__input"
+            type="text"
+            placeholder="Dr. Ronak Patel"
+            autoComplete="name"
+            value={name}
+            onChange={(event) => onNameChange(event.target.value)}
+            required
+            minLength={2}
+          />
         </label>
 
         <label className="qs-auth__label">
           Email
-          <input className="qs-auth__input" type="email" placeholder="name@institution.edu" required />
+          <input
+            className="qs-auth__input"
+            type="email"
+            placeholder="name@institution.edu"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => onEmailChange(event.target.value)}
+            required
+          />
         </label>
 
         <label className="qs-auth__label">
           Password
-          <input className="qs-auth__input" type="password" placeholder="Create a strong password" required />
+          <input
+            className="qs-auth__input"
+            type="password"
+            placeholder="Create a strong password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(event) => onPasswordChange(event.target.value)}
+            required
+            minLength={8}
+            pattern={PASSWORD_PATTERN}
+            title="At least 8 characters with a letter, number, and special character"
+          />
         </label>
 
-        <button className="qs-auth__submit qs-auth__submit--accent" type="submit">
-          Request access
+        <label className="qs-auth__label">
+          Confirm password
+          <input
+            className="qs-auth__input"
+            type="password"
+            placeholder="Repeat password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(event) => onConfirmPasswordChange(event.target.value)}
+            required
+          />
+        </label>
+
+        <button className="qs-auth__submit qs-auth__submit--accent" type="submit" disabled={submitting}>
+          {submitting ? 'Creating account…' : 'Request access'}
         </button>
 
+        {error ? <div className="qs-auth__status qs-auth__status--error">{error}</div> : null}
+        {status ? <div className="qs-auth__status qs-auth__status--success">{status}</div> : null}
+
         <div className="qs-auth__fineprint">
-          Access is verified for research institutions.
+          Passwords must be at least 8 characters long and include a letter, a number, and a special character.
         </div>
       </form>
 
@@ -40,4 +88,6 @@ export default function SignupPanel({ onSwitch }) {
     </div>
   )
 }
+
+export default memo(SignupPanel)
 

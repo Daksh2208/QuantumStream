@@ -1,13 +1,18 @@
 
 import * as Dialog from '@radix-ui/react-dialog'
 
-import LoginPanel from './LoginPanel.jsx'
-import SignupPanel from './SignupPanel.jsx'
+import LoginPage from '../pages/auth/LoginPage.jsx'
+import SignupPage from '../pages/auth/SignupPage.jsx'
 import useAuthTransition from './useAuthTransition.js'
 import './auth.css'
 
-export default function AuthModal({ open, onOpenChange }) {
+export default function AuthModal({ open, onOpenChange, onAuthenticated }) {
   const { mode, phase, classes, switchMode } = useAuthTransition()
+
+  function handleSuccess(user) {
+    onAuthenticated?.(user)
+    onOpenChange(false)
+  }
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
@@ -19,9 +24,9 @@ export default function AuthModal({ open, onOpenChange }) {
               className={`qs-auth__panel ${phase === 'leaving' ? classes.leaving : ''} ${phase === 'entering' ? classes.entering : ''}`}
             >
               {mode === 'signin' ? (
-                <LoginPanel onSwitch={() => switchMode('signup')} />
+                <LoginPage onSwitch={() => switchMode('signup')} onSuccess={handleSuccess} />
               ) : (
-                <SignupPanel onSwitch={() => switchMode('signin')} />
+                <SignupPage onSwitch={() => switchMode('signin')} onSuccess={handleSuccess} />
               )}
             </div>
           </div>

@@ -10,7 +10,7 @@ const SCENES = [
   { title: 'Quantum Collapse', caption: 'The measured state resolves into QuantumStream.' },
 ]
 
-export default function QuantumOverlay() {
+export default function QuantumOverlay({ user, onOpenAuth, onLogout }) {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -35,7 +35,9 @@ export default function QuantumOverlay() {
     <div className="qs-ui" aria-hidden={false}>
       <div className="qs-ui__top">
         <div className="qs-ui__brand">QuantumStream</div>
-        <div className="qs-ui__meta">Quantum research platform</div>
+        <div className="qs-ui__meta">
+          {user ? `Secured session for ${user.name}` : 'Quantum research platform'}
+        </div>
       </div>
 
       <div className="qs-ui__center" role="presentation">
@@ -48,11 +50,31 @@ export default function QuantumOverlay() {
           <button
             className="qs-ui__cta qs-ui__cta--primary"
             type="button"
-            onClick={() => window.dispatchEvent(new CustomEvent('qs:authOpen'))}
+            onClick={() => {
+              if (user) {
+                window.scrollTo({ top: window.innerHeight * 2, behavior: 'smooth' })
+                return
+              }
+
+              onOpenAuth()
+            }}
           >
-            Launch Quantum Lab
+            {user ? 'Enter Quantum Lab' : 'Launch Quantum Lab'}
           </button>
-          <button className="qs-ui__cta qs-ui__cta--secondary" type="button">Explore Architecture</button>
+          <button
+            className="qs-ui__cta qs-ui__cta--secondary"
+            type="button"
+            onClick={() => {
+              if (user) {
+                onLogout()
+                return
+              }
+
+              window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })
+            }}
+          >
+            {user ? 'Sign out' : 'Explore Architecture'}
+          </button>
         </div>
 
       </div>

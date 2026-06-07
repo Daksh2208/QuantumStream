@@ -17,6 +17,15 @@ html,body{height:100%}
   color:#0b0f17;
 }
 
+.qs-root__fallback{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(124,92,255,0.10), transparent 28%),
+    radial-gradient(circle at 70% 30%, rgba(0,191,255,0.10), transparent 26%),
+    linear-gradient(180deg, #fbfcfd 0%, #f5f8fb 100%);
+}
+
 /* Persistent WebGL canvas layer */
 .qs-root > div:first-child{
   position:fixed;
