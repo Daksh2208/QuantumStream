@@ -2,6 +2,7 @@
 import { lazy, Suspense, startTransition, useEffect, useState } from 'react'
 
 import { fetchCurrentUser, logoutUser } from './services/authService.js'
+import HomePage from './pages/HomePage.jsx'
 import './App.css'
 
 const QuantumScene = lazy(() => import('./quantum/QuantumScene.jsx'))
@@ -16,6 +17,7 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
   const [sessionReady, setSessionReady] = useState(false)
+  const [theme, setTheme] = useState('light')
 
   useEffect(() => {
     let active = true
@@ -62,19 +64,25 @@ export default function App() {
       startTransition(() => {
         setCurrentUser(null)
         setAuthOpen(false)
+        setTheme('light')
       })
     }
   }
 
   return (
-    <div className="qs-root">
+    <div className="qs-root" data-theme={theme}>
       <Suspense fallback={<SceneFallback />}>
         <QuantumScene />
-        <QuantumOverlay
-          user={sessionReady ? currentUser : null}
-          onOpenAuth={() => setAuthOpen(true)}
-          onLogout={handleLogout}
-        />
+
+        {sessionReady && currentUser ? (
+          <HomePage user={currentUser} theme={theme} onThemeChange={setTheme} onLogout={handleLogout} />
+        ) : (
+          <QuantumOverlay
+            user={sessionReady ? currentUser : null}
+            onOpenAuth={() => setAuthOpen(true)}
+            onLogout={handleLogout}
+          />
+        )}
 
         <AuthModal
           open={authOpen}
@@ -83,7 +91,7 @@ export default function App() {
         />
       </Suspense>
 
-      <div className="qs-scrollSpace" aria-hidden="true" />
+      {!currentUser ? <div className="qs-scrollSpace" aria-hidden="true" /> : null}
     </div>
   )
 }
