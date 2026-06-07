@@ -1,5 +1,5 @@
 
-import { lazy, Suspense, startTransition, useEffect, useState } from 'react'
+import { lazy, Suspense, startTransition, useEffect, useRef, useState } from 'react'
 
 import { fetchCurrentUser, logoutUser, refreshSession } from './services/authService.js'
 import HomePage from './pages/HomePage.jsx'
@@ -9,8 +9,25 @@ const QuantumScene = lazy(() => import('./quantum/QuantumScene.jsx'))
 const QuantumOverlay = lazy(() => import('./quantum/QuantumOverlay.jsx'))
 const AuthModal = lazy(() => import('./auth/AuthModal.jsx'))
 
+let sessionHydrationPromise = null
+
 function SceneFallback() {
   return <div className="qs-root__fallback" aria-hidden="true" />
+}
+
+async function hydrateSessionOnce() {
+  if (!sessionHydrationPromise) {
+    sessionHydrationPromise = (async () => {
+      try {
+        return await fetchCurrentUser()
+      } catch (primaryError) {
+        const response = await refreshSession()
+        return response.user
+      }
+    })()
+  }
+
+  return sessionHydrationPromise
 }
 
 export default function App() {
@@ -18,19 +35,18 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null)
   const [sessionReady, setSessionReady] = useState(false)
   const [theme, setTheme] = useState('light')
+  const currentUserRef = useRef(null)
+
+  useEffect(() => {
+    currentUserRef.current = currentUser
+  }, [currentUser])
 
   useEffect(() => {
     let active = true
 
     async function hydrateSession() {
       try {
-        let user = null
-
-        try {
-          user = await fetchCurrentUser()
-        } catch (error) {
-          user = await refreshSession().then((response) => response.user)
-        }
+        const user = await hydrateSessionOnce()
 
         if (active && user) {
           startTransition(() => setCurrentUser(user))
@@ -49,7 +65,7 @@ export default function App() {
     hydrateSession()
 
     const onOpen = () => {
-      if (!currentUser) {
+      if (!currentUserRef.current) {
         setAuthOpen(true)
       }
     }
@@ -60,7 +76,7 @@ export default function App() {
       active = false
       window.removeEventListener('qs:authOpen', onOpen)
     }
-  }, [currentUser])
+  }, [])
 
   async function handleLogout() {
     try {

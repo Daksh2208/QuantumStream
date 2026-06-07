@@ -24,7 +24,14 @@ async function requestAuth(path, method, body) {
 
     return response.data;
   } catch (error) {
-    throw new Error(getErrorMessage(error, 'Authentication request failed'));
+    const message = error?.response?.status === 429
+      ? 'Too many authentication attempts. Please wait a few minutes and try again.'
+      : getErrorMessage(error, 'Authentication request failed');
+
+    const authError = new Error(message);
+    authError.status = error?.response?.status;
+    authError.retryAfter = error?.response?.headers?.['retry-after'];
+    throw authError;
   }
 }
 
@@ -49,6 +56,13 @@ export async function fetchCurrentUser() {
     const response = await authClient.get('/me');
     return response.data.user;
   } catch (error) {
-    throw new Error(getErrorMessage(error, 'Session unavailable'));
+    const message = error?.response?.status === 429
+      ? 'Too many authentication attempts. Please wait a few minutes and try again.'
+      : getErrorMessage(error, 'Session unavailable');
+
+    const authError = new Error(message);
+    authError.status = error?.response?.status;
+    authError.retryAfter = error?.response?.headers?.['retry-after'];
+    throw authError;
   }
 }
