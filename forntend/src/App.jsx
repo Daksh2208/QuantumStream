@@ -1,7 +1,7 @@
 
 import { lazy, Suspense, startTransition, useEffect, useState } from 'react'
 
-import { fetchCurrentUser, logoutUser } from './services/authService.js'
+import { fetchCurrentUser, logoutUser, refreshSession } from './services/authService.js'
 import HomePage from './pages/HomePage.jsx'
 import './App.css'
 
@@ -24,8 +24,15 @@ export default function App() {
 
     async function hydrateSession() {
       try {
-        const user = await fetchCurrentUser()
-        if (active) {
+        let user = null
+
+        try {
+          user = await fetchCurrentUser()
+        } catch (error) {
+          user = await refreshSession().then((response) => response.user)
+        }
+
+        if (active && user) {
           startTransition(() => setCurrentUser(user))
         }
       } catch (error) {
