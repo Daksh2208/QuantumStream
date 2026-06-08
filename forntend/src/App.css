@@ -7,7 +7,7 @@
   --qs-a3:#4A90FF;
 }
 
-html,body{height:100%}
+html,body{}
 
 .qs-root{
   position:relative;
@@ -26,12 +26,7 @@ html,body{height:100%}
     linear-gradient(180deg, #fbfcfd 0%, #f5f8fb 100%);
 }
 
-/* Persistent WebGL canvas layer */
-.qs-root > div:first-child{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-}
+/* Persistent WebGL canvas layer (removed to prevent making LandingPage fixed) */
 
 .qs-scrollSpace{
   height: 680vh;

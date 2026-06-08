@@ -4,9 +4,9 @@ function LoginPanel({ email, error, onEmailChange, onPasswordChange, onSubmit, o
 
   return (
     <div className="qs-auth__panel">
-      <div className="qs-auth__kicker">QuantumStream / Research Access</div>
+      <div className="qs-auth__kicker">Welcome Back</div>
       <h2 className="qs-auth__title">Log in</h2>
-      <p className="qs-auth__desc">Enter to continue the experiment. Your credentials remain encrypted end-to-end.</p>
+      <p className="qs-auth__desc">Enter your credentials to access the QuantumStream workspace.</p>
 
       <form className="qs-auth__form" onSubmit={onSubmit}>
         <label className="qs-auth__label">
@@ -14,7 +14,7 @@ function LoginPanel({ email, error, onEmailChange, onPasswordChange, onSubmit, o
           <input
             className="qs-auth__input"
             type="email"
-            placeholder="name@institution.edu"
+            placeholder="name@company.com"
             autoComplete="email"
             value={email}
             onChange={(event) => onEmailChange(event.target.value)}
@@ -42,9 +42,6 @@ function LoginPanel({ email, error, onEmailChange, onPasswordChange, onSubmit, o
         {error ? <div className="qs-auth__status qs-auth__status--error">{error}</div> : null}
         {status ? <div className="qs-auth__status qs-auth__status--success">{status}</div> : null}
 
-        <div className="qs-auth__fineprint">
-          By continuing, you agree to the QuantumStream research access terms.
-        </div>
       </form>
 
       <div className="qs-auth__switch">

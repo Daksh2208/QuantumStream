@@ -6,17 +6,17 @@ function SignupPanel({ confirmPassword, email, error, name, onConfirmPasswordCha
 
   return (
     <div className="qs-auth__panel">
-      <div className="qs-auth__kicker">QuantumStream / Research Access</div>
+      <div className="qs-auth__kicker">Get Started</div>
       <h2 className="qs-auth__title">Create account</h2>
-      <p className="qs-auth__desc">Request access to simulate quantum circuits and validate post‑quantum security workflows.</p>
+      <p className="qs-auth__desc">Join developers building the future of quantum applications.</p>
 
       <form className="qs-auth__form" onSubmit={onSubmit}>
         <label className="qs-auth__label">
-          Name
+          Full Name
           <input
             className="qs-auth__input"
             type="text"
-            placeholder="Dr. Ronak Patel"
+            placeholder="Jane Doe"
             autoComplete="name"
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
@@ -30,7 +30,7 @@ function SignupPanel({ confirmPassword, email, error, name, onConfirmPasswordCha
           <input
             className="qs-auth__input"
             type="email"
-            placeholder="name@institution.edu"
+            placeholder="name@company.com"
             autoComplete="email"
             value={email}
             onChange={(event) => onEmailChange(event.target.value)}
@@ -68,7 +68,7 @@ function SignupPanel({ confirmPassword, email, error, name, onConfirmPasswordCha
         </label>
 
         <button className="qs-auth__submit qs-auth__submit--accent" type="submit" disabled={submitting}>
-          {submitting ? 'Creating account…' : 'Request access'}
+          {submitting ? 'Creating account…' : 'Create Account'}
         </button>
 
         {error ? <div className="qs-auth__status qs-auth__status--error">{error}</div> : null}

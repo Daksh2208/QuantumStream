@@ -1,26 +1,20 @@
+import { lazy, startTransition, useEffect, useRef, useState } from 'react'
 
-import { lazy, Suspense, startTransition, useEffect, useRef, useState } from 'react'
-
-import { fetchCurrentUser, logoutUser, refreshSession } from './services/authService.js'
-import HomePage from './pages/HomePage.jsx'
+import { fetchCurrentUser, refreshSession } from './services/authService.js'
+import LandingPage from './pages/LandingPage.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 import './App.css'
 
-const QuantumScene = lazy(() => import('./quantum/QuantumScene.jsx'))
-const QuantumOverlay = lazy(() => import('./quantum/QuantumOverlay.jsx'))
 const AuthModal = lazy(() => import('./auth/AuthModal.jsx'))
 
 let sessionHydrationPromise = null
-
-function SceneFallback() {
-  return <div className="qs-root__fallback" aria-hidden="true" />
-}
 
 async function hydrateSessionOnce() {
   if (!sessionHydrationPromise) {
     sessionHydrationPromise = (async () => {
       try {
         return await fetchCurrentUser()
-      } catch (primaryError) {
+      } catch {
         const response = await refreshSession()
         return response.user
       }
@@ -33,8 +27,7 @@ async function hydrateSessionOnce() {
 export default function App() {
   const [authOpen, setAuthOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
-  const [sessionReady, setSessionReady] = useState(false)
-  const [theme, setTheme] = useState('light')
+  const [theme] = useState('light')
   const currentUserRef = useRef(null)
 
   useEffect(() => {
@@ -51,13 +44,9 @@ export default function App() {
         if (active && user) {
           startTransition(() => setCurrentUser(user))
         }
-      } catch (error) {
+      } catch {
         if (active) {
           startTransition(() => setCurrentUser(null))
-        }
-      } finally {
-        if (active) {
-          startTransition(() => setSessionReady(true))
         }
       }
     }
@@ -78,46 +67,25 @@ export default function App() {
     }
   }, [])
 
-  async function handleLogout() {
-    try {
-      await logoutUser()
-    } catch (error) {
-      // Clear client state even if the cookie is already gone.
-    } finally {
-      startTransition(() => {
-        setCurrentUser(null)
-        setAuthOpen(false)
-        setTheme('light')
-      })
-    }
-  }
-
   return (
     <div className="qs-root" data-theme={theme}>
-      <Suspense fallback={<SceneFallback />}>
-        <QuantumScene />
-
-        {sessionReady && currentUser ? (
-          <HomePage user={currentUser} theme={theme} onThemeChange={setTheme} onLogout={handleLogout} />
-        ) : (
-          <QuantumOverlay
-            user={sessionReady ? currentUser : null}
-            onOpenAuth={() => setAuthOpen(true)}
-            onLogout={handleLogout}
-          />
-        )}
-
-        <AuthModal
-          open={authOpen}
-          onOpenChange={setAuthOpen}
-          onAuthenticated={(user) => startTransition(() => setCurrentUser(user))}
+      {currentUser ? (
+        <Dashboard user={currentUser} onLogout={() => startTransition(() => setCurrentUser(null))} />
+      ) : (
+        <LandingPage
+          theme={theme}
+          onLogin={() => setAuthOpen(true)}
+          onStartBuilding={() => setAuthOpen(true)}
+          hideCtas={false}
+          showTopDivider={true}
         />
-      </Suspense>
+      )}
 
-      {!currentUser ? <div className="qs-scrollSpace" aria-hidden="true" /> : null}
+      <AuthModal
+        open={authOpen}
+        onOpenChange={setAuthOpen}
+        onAuthenticated={(user) => startTransition(() => setCurrentUser(user))}
+      />
     </div>
   )
 }
-
-
-
